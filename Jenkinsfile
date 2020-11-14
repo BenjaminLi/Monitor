@@ -18,7 +18,7 @@ pipeline {
      * 自定义环境变量
      */
     environment {
-        GIT_URL       = 'git@github.com:jeffwji/DevOpsDashboard.git'
+        GIT_URL       = 'git@github.com:jeffwji/Monitor.git'
         CREDENTIAL    = 'Github'
         BRANCH        = 'develop'
     }
@@ -74,7 +74,7 @@ pipeline {
                  * withPythonEnv 函数需要 Jenkins Pyenv plugin 支持
                  */
                 withPythonEnv("${workspace}/.venv/bin/"){
-                    dir("${workspace}/Monitor") {
+                    dir("${workspace}") {
                         sh 'pip install wheel nose coverage nosexcover pylint'
                         sh 'pip install -r requirements.txt'
                         sh 'pip list'
@@ -90,7 +90,7 @@ pipeline {
             steps {
                 echo 'Run test cases'
                 withPythonEnv("${workspace}/.venv/bin/"){
-                    dir("${workspace}/Monitor") {
+                    dir("${workspace}") {
                         // sh 'python setup.py test'
                         sh 'nosetests -sv --with-xunit --xunit-file=nosetests.xml --with-xcoverage --xcoverage-file=coverage.xml'
                     }
@@ -105,7 +105,7 @@ pipeline {
             steps {
                 echo 'Build Monitor'
                 withPythonEnv("${workspace}/.venv/bin/"){
-                    dir("${workspace}/Monitor") {
+                    dir("${workspace}") {
                         sh 'python setup.py egg_info -bDEV bdist_wheel'
                     }
                 }
