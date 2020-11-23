@@ -75,7 +75,7 @@ pipeline {
                  */
                 withPythonEnv("${workspace}/.venv/bin/"){
                     dir("${workspace}") {
-                        sh 'pip install wheel nose coverage nosexcover pylint'
+                        sh 'pip install wheel nose coverage nosexcover pylint twine'
                         sh 'pip install -r requirements.txt'
                         sh 'pip list'
                     }
@@ -108,7 +108,7 @@ pipeline {
                     dir("${workspace}") {
                         script {sonarHome=tool 'SonarQube Scanner'}    // name is defined in `Global Tool Configuration`
                         withSonarQubeEnv('MySonarQube') {                      // name is defined in `Configure System`
-                            sh 'set'
+                            sh 'echo workspace=${sonarHome}'
                             sh 'sonar-scanner \
                                 -Dsonar.host.url=http://192.168.10.65:9000 \
                                 -Dsonar.projectKey=Monitor \
@@ -134,13 +134,15 @@ pipeline {
 
         /**
          * Package
+         *
+         * 关于 Python 版本规范：https://www.python.org/dev/peps/pep-0440/
          */
         stage('Build') {
             steps {
                 echo 'Build Monitor'
                 withPythonEnv("${workspace}/.venv/bin/"){
                     dir("${workspace}") {
-                        sh 'python setup.py egg_info -bDEV bdist_wheel'
+                        sh 'python setup.py egg_info -b.dev$(date '+%s') bdist_wheel'
                     }
                 }
             }
