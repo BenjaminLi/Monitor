@@ -106,9 +106,10 @@ pipeline {
             steps {
                 withPythonEnv("${workspace}/.venv/bin/"){
                     dir("${workspace}") {
-                        script {scannerHome=tool 'SonarQube Scanner'}    // name is defined in `Global Tool Configuration`
+                        script {SONAR_RUNNER_HOME=tool 'SonarQube Scanner'}    // name is defined in `Global Tool Configuration`
                         withSonarQubeEnv('MySonarQube') {                // name is defined in `Configure System`
-                            sh '${scannerHome}/bin/sonar-scanner \
+                            sh '${SONAR_RUNNER_HOME}/bin/sonar-scanner \
+                                -Dsonar.host.url=http://192.168.10.65:9000 \
                                 -Dsonar.projectKey=Monitor \
                                 -Dsonar.projectVersion=1.0 \
                                 -Dsonar.language=py \
