@@ -162,7 +162,7 @@ pipeline {
                         // sh 'pip config set global.index-url http://192.168.10.65:8081/repository/pypi-central/simple'
                         // sh 'pip config set global.trusted-host 192.168.10.65'
                         // sh 'pip config set global.extra-index-url http://192.168.10.65:8081/repository/pypi/simple'
-                        sh 'cat << EOF > .pypirc
+                        sh '''cat << EOF > .pypirc
 [distutils]
     index-servers=
         internal_pypi
@@ -171,9 +171,9 @@ pipeline {
     repository: http://192.168.10.65:8081/repository/pypi
     username: ${user}
     password: ${pass}
-EOF'
+EOF'''
 
-                        sh "cat .pypirc"
+                        sh 'cat .pypirc'
 
                         //sh 'twine --config-file=.pypirc'
                     }
