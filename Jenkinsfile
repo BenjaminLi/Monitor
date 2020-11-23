@@ -113,11 +113,34 @@ pipeline {
         }
 
         /**
-         * Binary scan if existing(For example: Acqu scan)
+         * Call SonarQube scanner
+         * It will load in coverage and other reports generated from previous step.
          */
-        stage('Binary Scan') {
+        stage('Sonar scan') {
             steps {
-                echo 'Binary scan'
+                withPythonEnv("${workspace}/.venv/bin/"){
+                    dir("${workspace}") {
+                        script {scannerHome=tool 'SonarQube Scanner'}    // name is defined in `Global Tool Configuration`
+                        withSonarQubeEnv('MySonarQube') {                // name is defined in `Configure System`
+                            sh '${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=Monitor \
+                                -Dsonar.projectVersion=1.0 \
+                                -Dsonar.language=py \
+                                -Dsonar.tests=./tests \
+                                -Dsonar.exclusions=setup.py,**/__init__.py \
+                                -Dsonar.sourceEncoding=UTF-8 \
+                                -Dsonar.python.xunit.reportPath=nosetests.xml \
+                                -Dsonar.python.coverage.reportPaths=coverage.xml \
+                                -Dsonar.python.pylint=/usr/local/bin/pylint \
+                                -Dsonar.python.pylint_config=.pylintrc \
+                                -Dsonar.python.pylint.reportPath=pylint-report.txt'
+                        }
+                    }
+                }
+        
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
