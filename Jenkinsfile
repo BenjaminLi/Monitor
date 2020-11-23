@@ -21,6 +21,7 @@ pipeline {
         GIT_URL       = 'git@github.com:jeffwji/Monitor.git'
         CREDENTIAL    = 'Github'
         BRANCH        = 'develop'
+        PYPI_CREDENTIAL = "PypiRepo"
     }
 
     /**
@@ -153,7 +154,30 @@ pipeline {
          */
         stage('Pushing to Repository') {
             steps {
-                echo 'Pushing to repository'
+                echo 'Upload Monitor'
+                withPythonEnv("${workspace}/.venv/bin/"){
+                    dir("${workspace}") {
+                        withCredentials([usernamePassword(credentialsId: "${env.PYPI_CREDENTIAL}", passwordVariable: 'pass', usernameVariable: 'user')]){
+                        // sh 'pip config set global.index http://192.168.10.65:8081/repository/pypi-central/simple'
+                        // sh 'pip config set global.index-url http://192.168.10.65:8081/repository/pypi-central/simple'
+                        // sh 'pip config set global.trusted-host 192.168.10.65'
+                        // sh 'pip config set global.extra-index-url http://192.168.10.65:8081/repository/pypi/simple'
+                        sh 'cat << EOF > .pypirc
+[distutils]
+    index-servers=
+        internal_pypi
+
+[internal_pypi]
+    repository: http://192.168.10.65:8081/repository/pypi
+    username: ${user}
+    password: ${pass}
+EOF'
+
+                        sh "cat .pypirc"
+
+                        //sh 'twine --config-file=.pypirc'
+                    }
+                }
             }
         }
     }
