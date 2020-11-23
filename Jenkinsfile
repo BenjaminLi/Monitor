@@ -108,6 +108,7 @@ pipeline {
                     dir("${workspace}") {
                         script {sonarHome=tool 'SonarQube Scanner'}    // name is defined in `Global Tool Configuration`
                         withSonarQubeEnv('MySonarQube') {                      // name is defined in `Configure System`
+                            sh 'set'
                             sh 'sonar-scanner \
                                 -Dsonar.host.url=http://192.168.10.65:9000 \
                                 -Dsonar.projectKey=Monitor \
