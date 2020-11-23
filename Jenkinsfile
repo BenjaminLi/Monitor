@@ -99,20 +99,6 @@ pipeline {
         }
 
         /**
-         * Package
-         */
-        stage('Build') {
-            steps {
-                echo 'Build Monitor'
-                withPythonEnv("${workspace}/.venv/bin/"){
-                    dir("${workspace}") {
-                        sh 'python setup.py egg_info -bDEV bdist_wheel'
-                    }
-                }
-            }
-        }
-
-        /**
          * Call SonarQube scanner
          * It will load in coverage and other reports generated from previous step.
          */
@@ -140,6 +126,20 @@ pipeline {
         
                 timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        /**
+         * Package
+         */
+        stage('Build') {
+            steps {
+                echo 'Build Monitor'
+                withPythonEnv("${workspace}/.venv/bin/"){
+                    dir("${workspace}") {
+                        sh 'python setup.py egg_info -bDEV bdist_wheel'
+                    }
                 }
             }
         }
