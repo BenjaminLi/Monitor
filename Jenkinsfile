@@ -142,7 +142,7 @@ pipeline {
                 echo 'Build Monitor'
                 withPythonEnv("${workspace}/.venv/bin/"){
                     dir("${workspace}") {
-                        sh "python setup.py egg_info -b.dev$(date '+%s') bdist_wheel"
+                        sh 'python setup.py egg_info -b.dev$(date "+%s") bdist_wheel'
                     }
                 }
             }
