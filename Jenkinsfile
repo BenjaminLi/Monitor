@@ -111,7 +111,7 @@ pipeline {
                         withSonarQubeEnv('MySonarQube') {                      // name is defined in `Configure System`
                             sh 'echo workspace=${sonarHome}'
                             sh 'sonar-scanner \
-                                -Dsonar.host.url=http://192.168.10.65:9000 \
+                                -Dsonar.host.url=http://192.168.56.110:9000 \
                                 -Dsonar.projectKey=Monitor \
                                 -Dsonar.projectVersion=1.0 \
                                 -Dsonar.language=py \
@@ -170,7 +170,7 @@ pipeline {
         internal_pypi
 
 [internal_pypi]
-    repository: http://192.168.10.65:8081/repository/pypi/
+    repository: http://192.168.56.110:8081/repository/pypi/
     username: ${user}
     password: ${pass}
 EOF'''
