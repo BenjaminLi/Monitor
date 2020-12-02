@@ -162,7 +162,7 @@ pipeline {
          * Pushing to Nexus
          *
          * Run the following commands on client:
-         *   pip config set global.index http://nexus:8081/repository/pypi-central/simple
+         *   pip config set global.index http://nexus:8081/repository/pypi-central/pypi
          *   pip config set global.index-url http://nexus:8081/repository/pypi-central/simple
          *   pip config set global.trusted-host nexus
          *   pip config set global.extra-index-url http://nexus:8081/repository/pypi/simple
