@@ -76,9 +76,18 @@ pipeline {
                  */
                 withPythonEnv("${workspace}/.venv/bin/"){
                     dir("${workspace}") {
-                        sh 'pip install wheel nose coverage nosexcover pylint twine'
-                        sh 'pip install -r requirements.txt'
-                        sh 'pip list'
+                        sh '''
+                            for pkg in libffi-dev openssl-dev
+                            do
+                                if ! (apk list 2>&1|grep -q ${pkg}); then
+                                    echo $pkg
+                                    apk -U --no-cache add ${pkg}
+                                fi
+                            done
+                            pip install wheel nose coverage nosexcover pylint twine
+                            pip install -r requirements.txt
+                            pip list
+                        '''
                     }
                 }
             }
@@ -107,11 +116,11 @@ pipeline {
             steps {
                 withPythonEnv("${workspace}/.venv/bin/"){
                     dir("${workspace}") {
-                        script {sonarHome=tool 'SonarQube Scanner'}    // name is defined in `Global Tool Configuration`
-                        withSonarQubeEnv('MySonarQube') {                      // name is defined in `Configure System`
+                        script {env.sonarHome=tool name:'SonarQube_Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'}    // name is defined in `Global Tool Configuration`
+                        withSonarQubeEnv('SonarQube') {                      // name is defined in `Configure System`
                             sh 'echo workspace=${sonarHome}'
-                            sh 'sonar-scanner \
-                                -Dsonar.host.url=http://192.168.56.110:9000 \
+                            sh '${sonarHome}/bin/sonar-scanner \
+                                -Dsonar.host.url=http://sonarqube:9000 \
                                 -Dsonar.projectKey=Monitor \
                                 -Dsonar.projectVersion=1.0 \
                                 -Dsonar.language=py \
@@ -153,10 +162,10 @@ pipeline {
          * Pushing to Nexus
          *
          * Run the following commands on client:
-         *   pip config set global.index http://192.168.10.65:8081/repository/pypi-central/simple
-         *   pip config set global.index-url http://192.168.10.65:8081/repository/pypi-central/simple
-         *   pip config set global.trusted-host 192.168.10.65
-         *   pip config set global.extra-index-url http://192.168.10.65:8081/repository/pypi/simple
+         *   pip config set global.index http://nexus:8081/repository/pypi-central/simple
+         *   pip config set global.index-url http://nexus:8081/repository/pypi-central/simple
+         *   pip config set global.trusted-host nexus
+         *   pip config set global.extra-index-url http://nexus:8081/repository/pypi/simple
          */
         stage('Pushing to Repository') {
             steps {
@@ -170,7 +179,7 @@ pipeline {
         internal_pypi
 
 [internal_pypi]
-    repository: http://192.168.56.110:8081/repository/pypi/
+    repository: http://nexus:8081/repository/pypi/
     username: ${user}
     password: ${pass}
 EOF'''
